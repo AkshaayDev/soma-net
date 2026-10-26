@@ -26,8 +26,6 @@ Soma is a minimal C++ library for **creating simple neural networks** from scrat
 Apart from standard C++ libraries, it does not have any external dependencies.
 This project is experimental and for educational purposes.
 
-> Disclaimer: Although the neural network library headers do not have any external dependencies, some of the examples in the `/examples` folder may have external dependencies (like raylib.h or stb_image.h)
-
 ## Features
 
 - Minimal purpose-built `NNMatrix` matrix class
