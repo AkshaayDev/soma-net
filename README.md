@@ -1,4 +1,4 @@
-# neural-network
+# soma-net
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@
 
 ## Overview
 
-This is a minimal C++ library for **creating simple neural networks** from scratch.
+Soma is a minimal C++ library for **creating simple neural networks** from scratch.
 Apart from standard C++ libraries, it does not have any external dependencies.
 This project is experimental and for educational purposes.
 
@@ -120,13 +120,13 @@ Attaches an optimizer and training data batch to the network and handles trainin
 Clone this repository:
 
 ```bash
-git clone https://github.com/akshaaydev/neural-network.git
+git clone https://github.com/akshaaydev/soma-net.git
 ```
 
-Then, include from the main neural network header `neural-network.hpp`.
+Then, include from the main neural network header `soma.hpp`.
 
 ```c++
-#include "/neural-network/neural-network.hpp"
+#include "/soma-net/soma.hpp"
 ```
 
 ### 2. Creating and Configuring the Network

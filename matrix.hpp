@@ -1,5 +1,5 @@
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef SOMA_MATRIX_HPP
+#define SOMA_MATRIX_HPP
 
 #include <vector>
 #include <iostream>

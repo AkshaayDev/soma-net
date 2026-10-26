@@ -1,5 +1,5 @@
-#ifndef NETWORK_HPP
-#define NETWORK_HPP
+#ifndef SOMA_NETWORK_HPP
+#define SOMA_NETWORK_HPP
 
 #include <cstdint>
 #include <fstream>
@@ -17,7 +17,7 @@ class Optimizer;
 
 class NeuralNetwork {
 public:
-	static const std::uint32_t SIGNATURE = 0x4E4E4454; // "NNDT", Used for validating data files
+	static const std::uint32_t SIGNATURE = 0x534f4d41; // "SOMA", Used for validating data files
 	std::vector<std::unique_ptr<Layer>> layers;
 	// Represents the structure of the neural network (How many neurons is in each layer)
 	int depth = 0; // Number of layers

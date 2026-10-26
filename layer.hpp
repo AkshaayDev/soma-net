@@ -1,5 +1,5 @@
-#ifndef LAYER_HPP
-#define LAYER_HPP
+#ifndef SOMA_LAYER_HPP
+#define SOMA_LAYER_HPP
 
 #include <cstdint>
 #include <fstream>

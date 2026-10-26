@@ -1,5 +1,5 @@
-#ifndef TRAINER_HPP
-#define TRAINER_HPP
+#ifndef SOMA_TRAINER_HPP
+#define SOMA_TRAINER_HPP
 
 #include <algorithm>
 #include <chrono>

@@ -1,9 +1,8 @@
-#ifndef INIT_HPP
-#define INIT_HPP
+#ifndef SOMA_INIT_HPP
+#define SOMA_INIT_HPP
 
 #include <chrono>
 #include <random>
-#include <cmath>
 
 #include "layer.hpp"
 #include "network.hpp"

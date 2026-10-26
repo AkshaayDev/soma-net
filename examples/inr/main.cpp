@@ -1,13 +1,9 @@
-// You are recommended to view `examples/xor/main.cpp` first
-#include "../../neural-network.hpp"
-// Include fstream library for saving and loading the network data
+#include "../../soma.hpp"
 #include <fstream>
-// Include stb_image and stb_image_write.h to load and write image data
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
 #include "stb_image_write.h"
-// Include OpenMP for parallel pixel processing
 #include <omp.h>
 
 NeuralNetwork nn;

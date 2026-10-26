@@ -12,7 +12,7 @@ Left Mouse: White brush
 Right Mouse: Black brush/Erase
 'C' Key: Clear canvas
 */
-#include "../../neural-network.hpp"
+#include "../../soma.hpp"
 #include "raylib.h"
 
 NNMatrix pixels(28 * 28, 1);

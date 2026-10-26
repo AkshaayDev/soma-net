@@ -5,10 +5,5 @@ examples/xor/out.dat
 examples/inr/nn.dat
 examples/inr/res.png
 
-# For node.js integration
-node_modules
-package.json
-package-lock.json
-
 # Training data
 examples/mnist/data

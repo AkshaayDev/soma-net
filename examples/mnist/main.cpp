@@ -1,4 +1,4 @@
-#include "../../neural-network.hpp"
+#include "../../soma.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>

@@ -1,5 +1,5 @@
-#ifndef SERIALIZATION_HPP
-#define SERIALIZATION_HPP
+#ifndef SOMA_SERIALIZATION_HPP
+#define SOMA_SERIALIZATION_HPP
 
 #include <cstdint>
 #include <fstream>

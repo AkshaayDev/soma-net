@@ -1,5 +1,5 @@
-#ifndef NN_HPP
-#define NN_HPP
+#ifndef SOMA_HPP
+#define SOMA_HPP
 
 #include "network.hpp"
 #include "optimizer.hpp"

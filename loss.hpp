@@ -1,5 +1,5 @@
-#ifndef LOSS_HPP
-#define LOSS_HPP
+#ifndef SOMA_LOSS_HPP
+#define SOMA_LOSS_HPP
 
 #include <cmath>
 #include <string>

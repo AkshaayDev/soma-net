@@ -1,5 +1,5 @@
-#ifndef ACTIVATION_HPP
-#define ACTIVATION_HPP
+#ifndef SOMA_ACTIVATION_HPP
+#define SOMA_ACTIVATION_HPP
 
 #include <cmath>
 #include <string>

@@ -1,6 +1,4 @@
-// Include neural network library header from parent directory
-#include "../../neural-network.hpp"
-// Include fstream library for saving the network data after training
+#include "../../soma.hpp"
 #include <fstream>
 
 // In this example, we will be using a simple 2,2,1 architecture to approximate an XOR gate

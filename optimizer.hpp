@@ -1,8 +1,7 @@
-#ifndef OPTIMIZER_HPP
-#define OPTIMIZER_HPP
+#ifndef SOMA_OPTIMIZER_HPP
+#define SOMA_OPTIMIZER_HPP
 
 #include <cmath>
-#include <cstdint>
 #include <fstream>
 #include <memory>
 #include <stdexcept>
