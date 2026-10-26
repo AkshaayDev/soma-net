@@ -258,6 +258,4 @@ trainer.train(100);
 
 ## Examples
 
-- XOR Gate (`examples/xor/main.cpp`): Approximation of the boolean XOR gate
-- Implicit Neural Representation (`examples/inr/main.cpp`): Recreation of an image
-- MNIST digit classification (`examples/mnist/main.cpp`): Recognize handwritten digits
+For example usages, refer to [soma-net-examples](https://github.com/akshaaydev/soma-net-examples.git) repository.
