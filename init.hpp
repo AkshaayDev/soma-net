@@ -16,7 +16,7 @@ namespace Soma::Initialization {
 
 	// Uniform Xavier initialization
 	// Initialize weights uniformly across +- sqrt(6/(in + out))
-	inline void xavierUniform(NeuralNetwork& nn, unsigned int seed = getSeed()) {
+	inline void xavierUniform(Network& nn, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
 			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
@@ -32,7 +32,7 @@ namespace Soma::Initialization {
 	}
 	// Normal Xavier initialization
 	// Initialize weights with a normal distribution with mean of 0 and standard deviation of sqrt(2/(in + out))
-	inline void xavierNormal(NeuralNetwork& nn, unsigned int seed = getSeed()) {
+	inline void xavierNormal(Network& nn, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
 			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
@@ -48,7 +48,7 @@ namespace Soma::Initialization {
 	}
 	// Uniform He initialization
 	// Initialize weights uniformly across +- sqrt(6/in)
-	inline void heUniform(NeuralNetwork& nn, unsigned int seed = getSeed()) {
+	inline void heUniform(Network& nn, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
 			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
@@ -64,7 +64,7 @@ namespace Soma::Initialization {
 	}
 	// Normal He initialization
 	// Initialize weights with a normal distribution with mean of 0 and standard deviation of sqrt(2/in)
-	inline void heNormal(NeuralNetwork& nn, unsigned int seed = getSeed()) {
+	inline void heNormal(Network& nn, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
 			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
@@ -81,7 +81,7 @@ namespace Soma::Initialization {
 	// SIREN parameter initialization
 	// Initialize first SIREN layer omega0 with 30.0 by default and parameters uniformly across +- 1/in
 	// Initialize other SIREN layer parameters uniformly across +- sqrt(6/in)/omega0
-	inline void SIRENInit(NeuralNetwork& nn, double omega0 = 30.0, unsigned int seed = getSeed()) {
+	inline void SIRENInit(Network& nn, double omega0 = 30.0, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
 			Layers::SIRENLayer* layer = dynamic_cast<Layers::SIRENLayer*>(nn.layers[i].get());
@@ -93,7 +93,7 @@ namespace Soma::Initialization {
 				layer->omega0 = omega0;
 			}
 			std::uniform_real_distribution<double> dis(-limit, limit);
-			for (NNMatrix& param : layer->params) {
+			for (Matrix& param : layer->params) {
 				param.forEach([&dis, &gen](double *val, int, int) {
 					*val = dis(gen);
 				});
@@ -105,7 +105,7 @@ namespace Soma::Initialization {
 	// Bias initialization functions
 
 	// Initialize biases to a constant
-	inline void constantBias(NeuralNetwork& nn, double constant) {
+	inline void constantBias(Network& nn, double constant) {
 		for (int i = 0; i < nn.depth; i++) {
 			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
 			if (layer == nullptr) continue; // Continue for non-DenseLayers

@@ -11,7 +11,7 @@
 #include "network.hpp"
 #include "optimizer.hpp"
 
-inline void Soma::NeuralNetwork::save(std::ofstream& out, Optimizers::Optimizer* opt) {
+inline void Soma::Network::save(std::ofstream& out, Optimizers::Optimizer* opt) {
 	// Write the signature
 	std::uint32_t sig = SIGNATURE;
 	out.write(reinterpret_cast<const char*>(&sig), sizeof(std::uint32_t));
@@ -39,7 +39,7 @@ inline void Soma::NeuralNetwork::save(std::ofstream& out, Optimizers::Optimizer*
 	}
 }
 
-inline void Soma::NeuralNetwork::load(std::ifstream& in, std::unique_ptr<Optimizers::Optimizer> opt) {
+inline void Soma::Network::load(std::ifstream& in, std::unique_ptr<Optimizers::Optimizer> opt) {
 	// Read the signature
 	std::uint32_t sig;
 	in.read(reinterpret_cast<char*>(&sig), sizeof(std::uint32_t));

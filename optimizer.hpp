@@ -16,36 +16,36 @@ namespace Soma::Optimizers {
 
 class Optimizer {
 public:
-	NeuralNetwork* nn = nullptr;
+	Network* nn = nullptr;
 
 	Optimizer() = default;
     virtual ~Optimizer() = default;
 
-	virtual void init(NeuralNetwork& network) {	nn = &network; }
+	virtual void init(Network& network) { nn = &network; }
 
 	virtual void update() = 0;
 	virtual OptimizerType getType() const = 0;
 	virtual void save(std::ofstream& out) = 0;
 	virtual void load(std::ifstream& in) = 0;
 
-	static std::unique_ptr<Optimizer> getByType(OptimizerType type, NeuralNetwork& nn);
+	static std::unique_ptr<Optimizer> getByType(OptimizerType type, Network& nn);
 protected:
 	// Initialize moments (Layers cannot change after attaching optimizer)
-	void initMoment(std::vector<std::vector<NNMatrix>>& moment) {
+	void initMoment(std::vector<std::vector<Matrix>>& moment) {
 		moment.resize(nn->depth);
 		for (int i = 0; i < nn->depth; i++) {
 			moment[i].resize(nn->layers[i]->params.size());
 			for (int j = 0; j < nn->layers[i]->params.size(); j++) {
-				NNMatrix& param = nn->layers[i]->params[j];
+				Matrix& param = nn->layers[i]->params[j];
 				moment[i][j].resize(param.rows(), param.cols());
 				moment[i][j].fill(0.0);
 			}
 		}
 	}
 	// Helper to write moments to an output file stream (Assuming matching dimensions)
-	void saveMoment(std::vector<std::vector<NNMatrix>>& moment, std::ofstream& out) {
-		for (std::vector<NNMatrix>& layerMoment : moment) {
-			for (NNMatrix& gradMoment : layerMoment) {
+	void saveMoment(std::vector<std::vector<Matrix>>& moment, std::ofstream& out) {
+		for (std::vector<Matrix>& layerMoment : moment) {
+			for (Matrix& gradMoment : layerMoment) {
 				gradMoment.forEach([&out](double *val, int, int) {
 					out.write(reinterpret_cast<const char*>(val), sizeof(double));
 				});
@@ -53,9 +53,9 @@ protected:
 		}
 	}
 	// Helper to read moments from an input file stream (Assuming matching dimensions)
-	void loadMoment(std::vector<std::vector<NNMatrix>>& moment, std::ifstream& in) {
-		for (std::vector<NNMatrix>& layerMoment : moment) {
-			for (NNMatrix& gradMoment : layerMoment) {
+	void loadMoment(std::vector<std::vector<Matrix>>& moment, std::ifstream& in) {
+		for (std::vector<Matrix>& layerMoment : moment) {
+			for (Matrix& gradMoment : layerMoment) {
 				for (int i = 0; i < gradMoment.rows(); i++) {
 					in.read(reinterpret_cast<char*>(gradMoment[i].data()), gradMoment.cols() * sizeof(double));
 				}
@@ -70,16 +70,16 @@ public:
 	double learningRate = 0.001;
 
 	GradientDescentOptimizer() = default;
-	GradientDescentOptimizer(NeuralNetwork& nn) { init(nn); }
-	GradientDescentOptimizer(NeuralNetwork& nn, double learningRate) : learningRate(learningRate) { init(nn); }
-	void init(NeuralNetwork& network) override { Optimizer::init(network); }
+	GradientDescentOptimizer(Network& nn) { init(nn); }
+	GradientDescentOptimizer(Network& nn, double learningRate) : learningRate(learningRate) { init(nn); }
+	void init(Network& network) override { Optimizer::init(network); }
 	
 	virtual void update() override {
 		// θ = θ - α * ∂L/∂θ
 		for (int i = 0; i < nn->depth; i++) {
 			for (int j = 0; j < nn->layers[i]->params.size(); j++) {
-				NNMatrix& param = nn->layers[i]->params[j];
-				NNMatrix& avgGrad = nn->avgGrads[i][j];
+				Matrix& param = nn->layers[i]->params[j];
+				Matrix& avgGrad = nn->avgGrads[i][j];
 				param = param - learningRate * avgGrad;
 			}
 		}
@@ -97,12 +97,12 @@ class MomentumOptimizer : public Optimizer {
 public:
 	double learningRate = 0.001;
 	double beta = 0.9;
-	std::vector<std::vector<NNMatrix>> velocity;
+	std::vector<std::vector<Matrix>> velocity;
 
 	MomentumOptimizer() = default;
-	MomentumOptimizer(NeuralNetwork& nn) { init(nn); }
-	MomentumOptimizer(NeuralNetwork& nn, double learningRate, double beta) : learningRate(learningRate), beta(beta) { init(nn); }
-	void init(NeuralNetwork& network) override {
+	MomentumOptimizer(Network& nn) { init(nn); }
+	MomentumOptimizer(Network& nn, double learningRate, double beta) : learningRate(learningRate), beta(beta) { init(nn); }
+	void init(Network& network) override {
 		Optimizer::init(network);
 		initMoment(velocity);
 	}
@@ -112,9 +112,9 @@ public:
 		// θ = θ - α * v
 		for (int i = 0; i < nn->depth; i++) {
 			for (int j = 0; j < nn->layers[i]->params.size(); j++) {
-				NNMatrix& param = nn->layers[i]->params[j];
-				NNMatrix& avgGrad = nn->avgGrads[i][j];
-				NNMatrix& v = velocity[i][j];
+				Matrix& param = nn->layers[i]->params[j];
+				Matrix& avgGrad = nn->avgGrads[i][j];
+				Matrix& v = velocity[i][j];
 				v = beta * v + (1 - beta) * avgGrad;
 				param = param - learningRate * v;
 			}
@@ -139,12 +139,12 @@ public:
 	double beta1 = 0.9;
 	double beta2 = 0.999;
 	double epsilon = 1e-8;
-	std::vector<std::vector<NNMatrix>> first, second;
+	std::vector<std::vector<Matrix>> first, second;
 
 	AdamOptimizer() = default;
-	AdamOptimizer(NeuralNetwork& nn) { init(nn); }
-	AdamOptimizer(NeuralNetwork& nn, double learningRate, double beta1, double beta2, double epsilon) : learningRate(learningRate), beta1(beta1), beta2(beta2), epsilon(epsilon) { init(nn); }
-	void init(NeuralNetwork& network) override {
+	AdamOptimizer(Network& nn) { init(nn); }
+	AdamOptimizer(Network& nn, double learningRate, double beta1, double beta2, double epsilon) : learningRate(learningRate), beta1(beta1), beta2(beta2), epsilon(epsilon) { init(nn); }
+	void init(Network& network) override {
 		Optimizer::init(network);
 		initMoment(first);
 		initMoment(second);
@@ -161,10 +161,10 @@ public:
 		double c2 = 1 - std::pow(beta2, nn->iterationsTrained + 1);
 		for (int i = 0; i < nn->depth; i++) {
 			for (int j = 0; j < nn->layers[i]->params.size(); j++) {
-				NNMatrix& param = nn->layers[i]->params[j];
-				NNMatrix& avgGrad = nn->avgGrads[i][j];
-				NNMatrix& m = first[i][j];
-				NNMatrix& v = second[i][j];
+				Matrix& param = nn->layers[i]->params[j];
+				Matrix& avgGrad = nn->avgGrads[i][j];
+				Matrix& m = first[i][j];
+				Matrix& v = second[i][j];
 				m = beta1 * m + (1 - beta1) * avgGrad;
 				v = beta2 * v + (1 - beta2) * (avgGrad ^ 2);
 				param = param - learningRate * (m/c1) / (((v/c2) ^ 0.5) + epsilon);
@@ -188,7 +188,7 @@ public:
 	}
 };
 
-inline std::unique_ptr<Optimizer> Optimizer::getByType(OptimizerType type, NeuralNetwork& nn) {
+inline std::unique_ptr<Optimizer> Optimizer::getByType(OptimizerType type, Network& nn) {
 	switch (type) {
 		case OptimizerType::GradientDescent:
 			return std::make_unique<GradientDescentOptimizer>(nn);

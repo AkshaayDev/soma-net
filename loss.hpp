@@ -8,17 +8,17 @@ namespace Soma::Loss {
 	const double epsilon = 1e-12;
 	// Mean Squared Error
 	// MSE = 1/n * ∑(p_i - r_i)^2
-	inline double MSE(NNMatrix predicted, NNMatrix real) {
+	inline double MSE(Matrix predicted, Matrix real) {
 		return ((predicted - real) ^ 2.0).sum() / real.rows();
 	}
 	// Derivative of Mean Squared Error
 	// MSE' = 2/n * (p_i - r_i)
-	inline NNMatrix MSEDerivative(NNMatrix predicted, NNMatrix real) {
+	inline Matrix MSEDerivative(Matrix predicted, Matrix real) {
 		return 2.0 / real.rows() * (predicted - real);
 	}
 	// Categorical Cross Entropy Loss
 	// CCE = - ∑ r_i log(p_i + ε)
-	inline double CCE(NNMatrix predicted, NNMatrix real) {
+	inline double CCE(Matrix predicted, Matrix real) {
 		double sum = 0;
 		predicted.forEach([&sum, &real](double *val, int i, int j) {
 			sum -= real[i][j] * std::log(*val + epsilon); // epsilon to avoid log(0)
@@ -27,7 +27,7 @@ namespace Soma::Loss {
 	}
 	// Derivative of Categorical Cross Entropy Loss
 	// CCE' = - r_i / (p_i + ε)
-	inline NNMatrix CCEDerivative(NNMatrix predicted, NNMatrix real) {
+	inline Matrix CCEDerivative(Matrix predicted, Matrix real) {
 		return -real / (predicted + epsilon); // epsilon to avoid / 0
 	}
 }

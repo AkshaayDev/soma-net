@@ -17,7 +17,7 @@ namespace Soma::Optimizers { class Optimizer; }
 
 namespace Soma {
 
-class NeuralNetwork {
+class Network {
 public:
 	static const std::uint32_t SIGNATURE = 0x534f4d41; // "SOMA", Used for validating data files
 	std::vector<std::unique_ptr<Layers::Layer>> layers;
@@ -26,12 +26,12 @@ public:
 	int iterationsTrained = 0, epochsTrained = 0;
 
 	// Averaged gradients of each layer
-	std::vector<std::vector<NNMatrix>> avgGrads;
+	std::vector<std::vector<Matrix>> avgGrads;
 
 	// Loss function for the network
 	std::string lossFnName;
-	std::function<double(NNMatrix, NNMatrix)> lossFn;
-	std::function<NNMatrix(NNMatrix, NNMatrix)> lossFnDerivative;
+	std::function<double(Matrix, Matrix)> lossFn;
+	std::function<Matrix(Matrix, Matrix)> lossFnDerivative;
 
 	// Setters
 
@@ -57,14 +57,14 @@ public:
 	}
 
 	// Accumulate and average the gradients for each sample in the batch
-	void averageGrads(std::vector<std::pair<NNMatrix, NNMatrix>> batch) {
+	void averageGrads(std::vector<std::pair<Matrix, Matrix>> batch) {
 		for (int i = 0; i < depth; i++) {
-			for (NNMatrix& avgGrad : avgGrads[i]) {
+			for (Matrix& avgGrad : avgGrads[i]) {
 				avgGrad.fill(0);
 			}
 		}
-		for (std::pair<NNMatrix, NNMatrix> sample : batch) {
-			NNMatrix predicted = forwardPropagation(sample.first);
+		for (std::pair<Matrix, Matrix> sample : batch) {
+			Matrix predicted = forwardPropagation(sample.first);
 			backwardPropagation(predicted, sample.second);
 			for (int i = 0; i < depth; i++) {
 				for (int j = 0; j < layers[i]->grads.size(); j++) {
@@ -73,14 +73,14 @@ public:
 			}
 		}
 		for (int i = 0; i < depth; i++) {
-			for (NNMatrix& avgGrad : avgGrads[i]) {
+			for (Matrix& avgGrad : avgGrads[i]) {
 				avgGrad = avgGrad / batch.size();
 			}
 		}
 	}
 
 	// Performs a feed forward without storing inputs or outputs
-	NNMatrix run(NNMatrix input) {
+	Matrix run(Matrix input) {
 		if (layers.empty()) throw std::runtime_error("Cannot run an empty network");
 		for (auto& layer : layers) {
 			input = layer->run(input);
@@ -88,7 +88,7 @@ public:
 		return input;
 	}
 	// Sets layer inputs and outputs after forward propagation of an input and returns network output
-	NNMatrix forwardPropagation(NNMatrix input) {
+	Matrix forwardPropagation(Matrix input) {
 		if (layers.empty()) throw std::runtime_error("Cannot forward propagate through an empty network");
 		for (auto& layer : layers) {
 			input = layer->forward(input);
@@ -97,9 +97,9 @@ public:
 	}
 	// Sets the layer gradients (partial derivatives of the loss with respect to its parameters)
 	// Note: forward propagation has to be called first and its recommended to pass its return value as `predicted`
-	void backwardPropagation(NNMatrix predicted, NNMatrix real) {
+	void backwardPropagation(Matrix predicted, Matrix real) {
 		if (layers.empty()) throw std::runtime_error("Cannot backward propagate through an empty network");
-		NNMatrix dy = lossFnDerivative(predicted, real);
+		Matrix dy = lossFnDerivative(predicted, real);
 		for (int i = depth - 1; i >= 0; i--) {
 			dy = layers[i]->backward(dy);
 		}

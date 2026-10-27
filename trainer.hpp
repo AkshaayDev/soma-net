@@ -15,13 +15,13 @@ namespace Soma {
 
 class Trainer {
 public:
-	NeuralNetwork& nn;
+	Network& nn;
 	Optimizers::Optimizer& opt;
-	std::vector<std::pair<NNMatrix, NNMatrix>>& batch;
+	std::vector<std::pair<Matrix, Matrix>>& batch;
 	std::function<void()> iterationCallback = []() {};
 	std::function<void()> epochCallback = []() {};
 	// Network reference and batch reference constructor
-	Trainer(NeuralNetwork& nn, Optimizers::Optimizer& opt, std::vector<std::pair<NNMatrix, NNMatrix>>& batch) : nn(nn), opt(opt), batch(batch) {}
+	Trainer(Network& nn, Optimizers::Optimizer& opt, std::vector<std::pair<Matrix, Matrix>>& batch) : nn(nn), opt(opt), batch(batch) {}
 	// Training data is split into smaller samples of `sampleSize` to be processed individually
 	// sampleSize is -1 by default, meaning the whole batch is processed at once
 	int sampleSize = -1;
@@ -36,7 +36,7 @@ public:
 		for (int epoch = 1; epoch <= epochs; epoch++) {
 			if (enableShuffling) std::shuffle(batch.begin(), batch.end(), gen);
 			for (int i = 0; i < batch.size(); i += actualSize) {
-				std::vector<std::pair<NNMatrix, NNMatrix>> sample(
+				std::vector<std::pair<Matrix, Matrix>> sample(
 					batch.begin() + i,
 					batch.begin() + std::min(i + actualSize, static_cast<int>(batch.size()))
 				);

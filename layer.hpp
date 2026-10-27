@@ -19,20 +19,20 @@ public:
 	int inCount = 0, outCount = 0; // Number of input and output neurons for the layer
 
 	// Optional parameters and gradients for training
-	std::vector<std::reference_wrapper<NNMatrix>> params;
-	std::vector<NNMatrix> grads;
+	std::vector<std::reference_wrapper<Matrix>> params;
+	std::vector<Matrix> grads;
 	// Optional last input and output storage for backpropagation
-	NNMatrix lastInput, lastOutput;
+	Matrix lastInput, lastOutput;
 
 	Layer(int inCount = 0, int outCount = 0) : inCount(inCount), outCount(outCount) {}
 
 	virtual ~Layer() = default;
 	// Returns an output without setting last input or output
-	virtual NNMatrix run(const NNMatrix& x) = 0;
+	virtual Matrix run(const Matrix& x) = 0;
 	// Returns an output and sets last input and/or output
-	virtual NNMatrix forward(const NNMatrix& x) = 0;
+	virtual Matrix forward(const Matrix& x) = 0;
 	// Sets gradients and returns error for input
-	virtual NNMatrix backward(const NNMatrix& dy) = 0;
+	virtual Matrix backward(const Matrix& dy) = 0;
 
 	// Save layer data to the file stream
 	virtual void save(std::ofstream& out) = 0;
@@ -43,26 +43,26 @@ public:
 class ActivationLayer : public Layer {
 public:
 	std::string fnName;
-	std::function<NNMatrix(NNMatrix)> f, g;
+	std::function<Matrix(Matrix)> f, g;
 	ActivationLayer(int count, std::string fnName) : Layer(count, count), fnName(fnName) {
 		if (fnName == ActivationType::Sigmoid) {
 			f = Activation::sigmoid;
-			g = [this](NNMatrix dy) { return Activation::sigmoidDerivative(lastOutput) * dy; };
+			g = [this](Matrix dy) { return Activation::sigmoidDerivative(lastOutput) * dy; };
 		} else if (fnName == ActivationType::ReLU) {
 			f = Activation::relu;
-			g = [this](NNMatrix dy) { return Activation::reluDerivative(lastOutput) * dy; };
+			g = [this](Matrix dy) { return Activation::reluDerivative(lastOutput) * dy; };
 		} else if (fnName == ActivationType::Tanh) {
 			f = Activation::tanh;
-			g = [this](NNMatrix dy) { return Activation::tanhDerivative(lastOutput) * dy; };		
+			g = [this](Matrix dy) { return Activation::tanhDerivative(lastOutput) * dy; };		
 		} else if (fnName == ActivationType::Softmax) {
 			f = Activation::softmax;
-			g = [this](NNMatrix dy) { return Activation::softmaxDerivative(lastOutput, dy); };
+			g = [this](Matrix dy) { return Activation::softmaxDerivative(lastOutput, dy); };
 		} else throw std::runtime_error("Unknown hidden activation function ('" + fnName + "')");
 	}
 
-	NNMatrix run(const NNMatrix& x) override { return f(x); }
-	NNMatrix forward(const NNMatrix& x) override { lastOutput = f(x); return lastOutput; }
-	NNMatrix backward(const NNMatrix& dy) override { return g(dy); }
+	Matrix run(const Matrix& x) override { return f(x); }
+	Matrix forward(const Matrix& x) override { lastOutput = f(x); return lastOutput; }
+	Matrix backward(const Matrix& dy) override { return g(dy); }
 
 	void save(std::ofstream& out) override {
 		// Write the layer type
@@ -94,7 +94,7 @@ public:
 
 class DenseLayer : public Layer {
 public:
-	NNMatrix W, B;
+	Matrix W, B;
 	DenseLayer(int in, int out) : Layer(in, out) {
 		W.resize(out, in);
 		B.resize(out, 1);
@@ -104,12 +104,12 @@ public:
 		grads[1].resize(out, 1);
 	}
 
-	NNMatrix run(const NNMatrix& x) override { return NNMatrix::dot(W, x) + B; } // y = W . x + B
-	NNMatrix forward(const NNMatrix& x) override { lastInput = x; return run(x); }
-	NNMatrix backward(const NNMatrix& dy) override {
-		grads[0] = NNMatrix::dot(dy, lastInput.transpose()); // dW = dy . x^T
+	Matrix run(const Matrix& x) override { return Matrix::dot(W, x) + B; } // y = W . x + B
+	Matrix forward(const Matrix& x) override { lastInput = x; return run(x); }
+	Matrix backward(const Matrix& dy) override {
+		grads[0] = Matrix::dot(dy, lastInput.transpose()); // dW = dy . x^T
 		grads[1] = dy; // dB = dy
-		return NNMatrix::dot(W.transpose(), dy); // dx = W^T . dy
+		return Matrix::dot(W.transpose(), dy); // dx = W^T . dy
 	}
 
 	void save(std::ofstream& out) override {
@@ -122,7 +122,7 @@ public:
 		out.write(reinterpret_cast<const char*>(&inCount), sizeof(int));
 		out.write(reinterpret_cast<const char*>(&outCount), sizeof(int));
 		// Write the weights and biases
-		for (NNMatrix& param : params) {
+		for (Matrix& param : params) {
 			param.forEach([&out](double *val, int, int) {
 				out.write(reinterpret_cast<const char*>(val), sizeof(double));
 			});
@@ -136,7 +136,7 @@ public:
 		in.read(reinterpret_cast<char*>(&outCount), sizeof(int));
 		std::unique_ptr<DenseLayer> layer = std::make_unique<DenseLayer>(inCount, outCount);
 		// Read the weights and biases
-		for (NNMatrix& mat : layer->params) {
+		for (Matrix& mat : layer->params) {
 			for (int i = 0; i < mat.rows(); i++) {
 				in.read(reinterpret_cast<char*>(mat[i].data()), mat.cols() * sizeof(double));
 			}
@@ -147,7 +147,7 @@ public:
 
 class SIRENLayer : public Layer {
 public:
-	NNMatrix W, B, lastZ;
+	Matrix W, B, lastZ;
 	double omega0 = 1.0;
 	SIRENLayer(int in, int out) : Layer(in, out) {
 		W.resize(out, in);
@@ -158,30 +158,30 @@ public:
 		grads[1].resize(out, 1);
 	}
 
-	NNMatrix run(const NNMatrix& x) override {
-		NNMatrix z = NNMatrix::dot(W, x) + B; // z = W . x + B
+	Matrix run(const Matrix& x) override {
+		Matrix z = Matrix::dot(W, x) + B; // z = W . x + B
 		z.forEach([this](double *val, int, int) {
 			*val = std::sin(omega0 * *val); // y = sin(omega0 * z)
 		});
 		return z;
 	}
-	NNMatrix forward(const NNMatrix& x) override {
+	Matrix forward(const Matrix& x) override {
 		lastInput = x;
-		NNMatrix z = NNMatrix::dot(W, x) + B; // z = W . x + B
+		Matrix z = Matrix::dot(W, x) + B; // z = W . x + B
 		lastZ = z;
 		z.forEach([this](double *val, int, int) {
 			*val = std::sin(omega0 * *val); // y = sin(omega0 * z)
 		});
 		return z;
 	}
-	NNMatrix backward(const NNMatrix& dy) override {
-		NNMatrix dz = lastZ; // dz = dy * omega0 cos(omega0 * z)
+	Matrix backward(const Matrix& dy) override {
+		Matrix dz = lastZ; // dz = dy * omega0 cos(omega0 * z)
 		dz.forEach([this, &dy](double *val, int i, int j) {
 			*val = dy[i][j] * omega0 * std::cos(omega0 * *val);
 		});
-		grads[0] = NNMatrix::dot(dz, lastInput.transpose()); // dW = dz . x^T
+		grads[0] = Matrix::dot(dz, lastInput.transpose()); // dW = dz . x^T
 		grads[1] = dz; // dB = dz
-		return NNMatrix::dot(W.transpose(), dz); // dx = W^T . dz
+		return Matrix::dot(W.transpose(), dz); // dx = W^T . dz
 	}
 
 	void save(std::ofstream& out) override {
@@ -196,7 +196,7 @@ public:
 		// Write omega0
 		out.write(reinterpret_cast<const char*>(&omega0), sizeof(double));
 		// Write the weights and biases
-		for (NNMatrix& param : params) {
+		for (Matrix& param : params) {
 			param.forEach([&out](double *val, int, int) {
 				out.write(reinterpret_cast<const char*>(val), sizeof(double));
 			});
@@ -212,7 +212,7 @@ public:
 		// Read omega0
 		in.read(reinterpret_cast<char*>(&layer->omega0), sizeof(double));
 		// Read the weights and biases
-		for (NNMatrix& mat : layer->params) {
+		for (Matrix& mat : layer->params) {
 			for (int i = 0; i < mat.rows(); i++) {
 				in.read(reinterpret_cast<char*>(mat[i].data()), mat.cols() * sizeof(double));
 			}

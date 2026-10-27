@@ -5,7 +5,7 @@
 - [Overview](#overview)
 - [Features](#features)
   1. [Network features](#1-network-features)
-  2. [NNMatrix features](#2-nnmatrix-features)
+  2. [Matrix features](#2-matrix-features)
   3. [Layers](#3-layers)
   4. [Initializations](#4-initializations)
   5. [Activation functions](#5-activation-functions)
@@ -28,8 +28,8 @@ This project is experimental and for educational purposes.
 
 ## Features
 
-- Minimal purpose-built `NNMatrix` matrix class
-- Feed-forward networks with `NeuralNetwork` class
+- Minimal purpose-built `Matrix` matrix class
+- Feed-forward networks with `Network` class
 - Network initialization, activation functions, loss functions
 - Forward propagation and backpropagation
 - Network saving and loading with a file stream
@@ -44,7 +44,7 @@ This project is experimental and for educational purposes.
 - Forward and backward propagation
 - Saving and loading network data (optionally with optimizer data)
 
-### 2. NNMatrix features
+### 2. Matrix features
 
 - `std::vector<std::vector<double>>` constructor
 - `rows` and `cols` constructor
@@ -59,7 +59,7 @@ This project is experimental and for educational purposes.
 - Check for `nan`s
 - Scalar and element-wise addition, subtraction, multiplication and division
 - Scalar exponentiation
-- Access data directly with `NNMatrix[row]`
+- Access data directly with `Matrix[row]`
 - Static dot product
 - Transpose of matrix
 - Maximum value of matrix
@@ -130,17 +130,17 @@ using namespace Soma; // Recommended but omit if there are name clashes with oth
 
 ### 2. Creating and Configuring the Network
 
-To create a network, define a `NeuralNetwork` object.
+To create a network, define a `Network` object.
 
 ```c++
-NeuralNetwork nn;
+Network nn;
 ```
 
 To set the network architecture, use the `addLayer()` function.
 
 ```c++
-nn.addLayer<DenseLayer>(2, 2); // This sets a dense layer that takes in and outputs 2 neurons
-nn.addLayer<ActivationLayer>(2, ActivationType::Sigmoid); // Applies sigmoid activation to the 2 neurons
+nn.addLayer<Layers::DenseLayer>(2, 2); // This sets a dense layer that takes in and outputs 2 neurons
+nn.addLayer<Layers::ActivationLayer>(2, ActivationType::Sigmoid); // Applies sigmoid activation to the 2 neurons
 ```
 
 To initialize the parameters of the network, use one of the functions from the `Initialization` namespace.
@@ -161,17 +161,17 @@ nn.setLossFunction(LossType::MSE);
 To run the network, use `run()`.
 
 ```c++
-// This does not set anything and returns the NNMatrix output of the network
-NNMatrix predicted = nn.run(input);
+// This does not set anything and returns the matrix output of the network
+Matrix predicted = nn.run(input);
 ```
 
 To forward propagate an input and set relevant last inputs and outputs for each layer, use `forwardPropagation()`.
 
 ```c++
 // This performs forward propagation with the input and returns the network output
-NNMatrix input;
+Matrix input;
 // Define `input` here
-NNMatrix predicted = nn.forwardPropagation(input);
+Matrix predicted = nn.forwardPropagation(input);
 ```
 
 To set parameter gradients, use `backwardPropagation()`.
@@ -180,7 +180,7 @@ To set parameter gradients, use `backwardPropagation()`.
 > However, propagation is handled by the network during training.
 
 ```c++
-NNMatrix real;
+Matrix real;
 // Define `real` here
 nn.backwardPropagation(predicted, real);
 ```
@@ -188,11 +188,11 @@ nn.backwardPropagation(predicted, real);
 ### 4. Saving and Loading
 
 To save network parameters and architecture, use the `save()` and `load()` functions.
-To save the optimizer data, call `save()` with an `Optimizer*` pointer to the optimizer.
-To load the optimizer data, call `load()` with a `std::unique_ptr<Optimizer>` pointer to the optimizer. If there is no optimizer data found in the input file stream, it will be ignored.
+To save the optimizer data, call `save()` with an `Optimizers::Optimizer*` pointer to the optimizer.
+To load the optimizer data, call `load()` with a `std::unique_ptr<Optimizers::Optimizer>` pointer to the optimizer. If there is no optimizer data found in the input file stream, it will be ignored.
 
 ```c++
-MomentumOptimizer mom(nn);
+Optimizers::MomentumOptimizer mom(nn);
 // Write the neural network data to a file `out.dat` with binary encoding
 std::ofstream out("out.dat", std::ios::binary);
 nn.save(out, &mom); // Save the network data to that file
@@ -200,31 +200,31 @@ out.close(); // Close the file
 ```
 
 ```c++
-MomentumOptimizer mom(nn);
+Optimizers::MomentumOptimizer mom(nn);
 // Read the neural network data from a file `in.dat` with binary encoding
 std::ifstream in("in.dat", std::ios::binary);
-nn.load(in, std::make_unique<MomentumOptimizer>(mom)); // Load the network data from that file
+nn.load(in, std::make_unique<Optimizers::MomentumOptimizer>(mom)); // Load the network data from that file
 in.close(); // Close the file
 ```
 
 ### 5. Training
 
-Before training the network, an optimizer object must be created to specify the type and hyperparameters of optimization. The optimizer type can be any derived class of the `Optimizer` class.
+Before training the network, an optimizer object must be created to specify the type and hyperparameters of optimization. The optimizer type can be any derived class of the `Optimizers::Optimizer` class.
 
 ```c++
-GradientDescentOptimizer gd(nn) // Attaches a network to `gd` with default parameters
-GradientDescentOptimizer gd(nn, 15) // Attaches a network to `gd` with learning rate 15
+Optimizers::GradientDescentOptimizer gd(nn) // Attaches a network to `gd` with default parameters
+Optimizers::GradientDescentOptimizer gd(nn, 15) // Attaches a network to `gd` with learning rate 15
 ```
 
 The optimizer constructor must include the network object and optionally the hyperparameters(See Optimizer features for their hyperparameters).
 
 To train the network, a trainer object must be created and initialized with the network, optimizer and batch.
-The batch is a `std::vector` of samples which is a `std::pair` of the input and output `NNMatrix`.
+The batch is a `std::vector` of samples which is a `std::pair` of the input and output `Matrix`.
 
 ```c++
-std::vector<std::pair<NNMatrix, NNMatrix>> batch;
+std::vector<std::pair<Matrix, Matrix>> batch;
 // Example sample that maps {{0},{0}} to {{0}}
-batch.push_back(std::make_pair(NNMatrix::fromVector({0,0}), NNMatrix::fromScalar(0.0))); // 0 ^ 0 = 0
+batch.push_back(std::make_pair(Matrix::fromVector({0,0}), Matrix::fromScalar(0.0))); // 0 ^ 0 = 0
 
 Trainer trainer(nn, gd, batch);
 ```
