@@ -125,6 +125,7 @@ Then, include from the main neural network header `soma.hpp`.
 
 ```c++
 #include "/soma-net/soma.hpp"
+using namespace Soma; // Recommended but omit if there are name clashes with other libraries
 ```
 
 ### 2. Creating and Configuring the Network

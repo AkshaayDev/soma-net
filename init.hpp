@@ -7,7 +7,7 @@
 #include "layer.hpp"
 #include "network.hpp"
 
-namespace Initialization {
+namespace Soma::Initialization {
 	// Helper functions for initializations
 	inline unsigned int getSeed() {
 		return static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
@@ -19,7 +19,7 @@ namespace Initialization {
 	inline void xavierUniform(NeuralNetwork& nn, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
-			DenseLayer* layer = dynamic_cast<DenseLayer*>(nn.layers[i].get());
+			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
 			if (layer == nullptr) continue; // Continue for non-DenseLayers
 
 			double limit = std::sqrt(6.0 / (layer->inCount + layer->outCount));
@@ -35,7 +35,7 @@ namespace Initialization {
 	inline void xavierNormal(NeuralNetwork& nn, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
-			DenseLayer* layer = dynamic_cast<DenseLayer*>(nn.layers[i].get());
+			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
 			if (layer == nullptr) continue; // Continue for non-DenseLayers
 
 			double stddev = std::sqrt(2.0 / (layer->inCount + layer->outCount));
@@ -51,7 +51,7 @@ namespace Initialization {
 	inline void heUniform(NeuralNetwork& nn, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
-			DenseLayer* layer = dynamic_cast<DenseLayer*>(nn.layers[i].get());
+			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
 			if (layer == nullptr) continue; // Continue for non-DenseLayers
 
 			double limit = std::sqrt(6.0 / layer->inCount);
@@ -67,7 +67,7 @@ namespace Initialization {
 	inline void heNormal(NeuralNetwork& nn, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
-			DenseLayer* layer = dynamic_cast<DenseLayer*>(nn.layers[i].get());
+			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
 			if (layer == nullptr) continue; // Continue for non-DenseLayers
 
 			double stddev = std::sqrt(2.0 / layer->inCount);
@@ -84,7 +84,7 @@ namespace Initialization {
 	inline void SIRENInit(NeuralNetwork& nn, double omega0 = 30.0, unsigned int seed = getSeed()) {
 		std::mt19937 gen(seed);
 		for (int i = 0; i < nn.depth; i++) {
-			SIRENLayer* layer = dynamic_cast<SIRENLayer*>(nn.layers[i].get());
+			Layers::SIRENLayer* layer = dynamic_cast<Layers::SIRENLayer*>(nn.layers[i].get());
 			if (layer == nullptr) continue; // Continue for non-SIRENLayers
 
 			double limit = std::sqrt(6.0 / layer->inCount) / layer->omega0;
@@ -107,7 +107,7 @@ namespace Initialization {
 	// Initialize biases to a constant
 	inline void constantBias(NeuralNetwork& nn, double constant) {
 		for (int i = 0; i < nn.depth; i++) {
-			DenseLayer* layer = dynamic_cast<DenseLayer*>(nn.layers[i].get());
+			Layers::DenseLayer* layer = dynamic_cast<Layers::DenseLayer*>(nn.layers[i].get());
 			if (layer == nullptr) continue; // Continue for non-DenseLayers
 
 			layer->B.forEach([constant](double *val, int, int) {

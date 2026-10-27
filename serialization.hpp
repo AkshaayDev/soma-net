@@ -11,7 +11,7 @@
 #include "network.hpp"
 #include "optimizer.hpp"
 
-inline void NeuralNetwork::save(std::ofstream& out, Optimizer* opt) {
+inline void Soma::NeuralNetwork::save(std::ofstream& out, Optimizers::Optimizer* opt) {
 	// Write the signature
 	std::uint32_t sig = SIGNATURE;
 	out.write(reinterpret_cast<const char*>(&sig), sizeof(std::uint32_t));
@@ -39,7 +39,7 @@ inline void NeuralNetwork::save(std::ofstream& out, Optimizer* opt) {
 	}
 }
 
-inline void NeuralNetwork::load(std::ifstream& in, std::unique_ptr<Optimizer> opt) {
+inline void Soma::NeuralNetwork::load(std::ifstream& in, std::unique_ptr<Optimizers::Optimizer> opt) {
 	// Read the signature
 	std::uint32_t sig;
 	in.read(reinterpret_cast<char*>(&sig), sizeof(std::uint32_t));
@@ -50,7 +50,7 @@ inline void NeuralNetwork::load(std::ifstream& in, std::unique_ptr<Optimizer> op
 	in.read(reinterpret_cast<char*>(&depth), sizeof(int));
 	// Read the layers
 	for (int i = 0; i < depth; i++) {
-		std::unique_ptr<Layer> layer = Layer::load(in);
+		std::unique_ptr<Layers::Layer> layer = Layers::Layer::load(in);
 		layers.emplace_back(std::move(layer));
 		avgGrads.push_back(layers.back()->grads);
 	}
@@ -70,7 +70,7 @@ inline void NeuralNetwork::load(std::ifstream& in, std::unique_ptr<Optimizer> op
 		// Note: This assumes the number for each OptimizerType is 0-255
 		std::uint8_t optType;
 		in.read(reinterpret_cast<char*>(&optType), sizeof(std::uint8_t));
-		opt = Optimizer::getByType(static_cast<OptimizerType>(optType), *this);
+		opt = Optimizers::Optimizer::getByType(static_cast<OptimizerType>(optType), *this);
 		opt->load(in);
 	}
 }

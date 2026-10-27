@@ -1,7 +1,6 @@
 #ifndef SOMA_OPTIMIZER_HPP
 #define SOMA_OPTIMIZER_HPP
 
-#include <cmath>
 #include <fstream>
 #include <memory>
 #include <stdexcept>
@@ -9,7 +8,11 @@
 
 #include "network.hpp"
 
-enum class OptimizerType { GradientDescent, Momentum, Adam };
+namespace Soma {
+	enum class OptimizerType { GradientDescent, Momentum, Adam };
+}
+
+namespace Soma::Optimizers {
 
 class Optimizer {
 public:
@@ -196,6 +199,8 @@ inline std::unique_ptr<Optimizer> Optimizer::getByType(OptimizerType type, Neura
 		default:
 			throw std::runtime_error("Unknown optimizer type found");
 	}
+}
+
 }
 
 // Optimizers are standalone objects and not network attributes

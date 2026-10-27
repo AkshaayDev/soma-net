@@ -11,15 +11,17 @@
 #include "network.hpp"
 #include "optimizer.hpp"
 
+namespace Soma {
+
 class Trainer {
 public:
 	NeuralNetwork& nn;
-	Optimizer& opt;
+	Optimizers::Optimizer& opt;
 	std::vector<std::pair<NNMatrix, NNMatrix>>& batch;
 	std::function<void()> iterationCallback = []() {};
 	std::function<void()> epochCallback = []() {};
 	// Network reference and batch reference constructor
-	Trainer(NeuralNetwork& nn, Optimizer& opt, std::vector<std::pair<NNMatrix, NNMatrix>>& batch) : nn(nn), opt(opt), batch(batch) {}
+	Trainer(NeuralNetwork& nn, Optimizers::Optimizer& opt, std::vector<std::pair<NNMatrix, NNMatrix>>& batch) : nn(nn), opt(opt), batch(batch) {}
 	// Training data is split into smaller samples of `sampleSize` to be processed individually
 	// sampleSize is -1 by default, meaning the whole batch is processed at once
 	int sampleSize = -1;
@@ -48,6 +50,8 @@ public:
 		}
 	}
 };
+
+}
 
 // Trainers are standalone objects and not network attributes
 // Therefore, the trainer object being used need not be specified in the network

@@ -13,12 +13,14 @@
 #include "layer.hpp"
 #include "loss.hpp"
 
-class Optimizer;
+namespace Soma::Optimizers { class Optimizer; }
+
+namespace Soma {
 
 class NeuralNetwork {
 public:
 	static const std::uint32_t SIGNATURE = 0x534f4d41; // "SOMA", Used for validating data files
-	std::vector<std::unique_ptr<Layer>> layers;
+	std::vector<std::unique_ptr<Layers::Layer>> layers;
 	// Represents the structure of the neural network (How many neurons is in each layer)
 	int depth = 0; // Number of layers
 	int iterationsTrained = 0, epochsTrained = 0;
@@ -105,11 +107,13 @@ public:
 
 	// Save the parameters, architecture and optionally moments to an output file stream
 	// `opt` is the a pointer to the optimizer for saving moments (leave empty to not save moments)
-	void save(std::ofstream& out, Optimizer* opt = nullptr);
+	void save(std::ofstream& out, Optimizers::Optimizer* opt = nullptr);
 
 	// Load the parameters, architecture and optionally moments from an input file stream
 	// `opt` is the a pointer to the optimizer for loading moments (leave empty to not load moments)
-	void load(std::ifstream& in, std::unique_ptr<Optimizer> opt = nullptr);
+	void load(std::ifstream& in, std::unique_ptr<Optimizers::Optimizer> opt = nullptr);
 };
+
+}
 
 #endif

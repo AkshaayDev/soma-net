@@ -12,6 +12,8 @@
 #include "activation.hpp"
 #include "matrix.hpp"
 
+namespace Soma::Layers {
+
 class Layer {
 public:
 	int inCount = 0, outCount = 0; // Number of input and output neurons for the layer
@@ -219,7 +221,7 @@ public:
 	}
 };
 
-inline std::unique_ptr<Layer> Layer::load(std::ifstream& in) {
+inline std::unique_ptr<Layer> Soma::Layers::Layer::load(std::ifstream& in) {
 	std::string type;
 	std::uint32_t size = 0;
 	in.read(reinterpret_cast<char*>(&size), sizeof(std::uint32_t));
@@ -229,6 +231,8 @@ inline std::unique_ptr<Layer> Layer::load(std::ifstream& in) {
 	if (type == "Dense") return DenseLayer::load(in);
 	if (type == "SIREN") return SIRENLayer::load(in);
 	throw std::runtime_error("Unknown layer type found.");
+}
+
 }
 
 #endif

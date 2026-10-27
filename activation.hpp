@@ -1,12 +1,11 @@
 #ifndef SOMA_ACTIVATION_HPP
 #define SOMA_ACTIVATION_HPP
 
-#include <cmath>
 #include <string>
 #include <algorithm>
 #include "./matrix.hpp"
 
-namespace Activation {
+namespace Soma::Activation {
 	// Sigmoid activation function
 	// σ(x) = 1 / (1 + e^-x)
 	inline NNMatrix sigmoid(NNMatrix input) {
@@ -74,7 +73,7 @@ namespace Activation {
 
 // Activation functions are network attributes and need to be specified in the network
 // The strings in this namespace are used to identify the activation functions of the network for saving and loading
-namespace ActivationType {
+namespace Soma::ActivationType {
 	const std::string Sigmoid = "sigmoid";
 	const std::string ReLU = "relu";
 	const std::string Tanh = "tanh";

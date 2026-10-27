@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <string>
 
+namespace Soma {
+
 // Minimal matrix class
 class NNMatrix {
 public:
@@ -263,5 +265,7 @@ public:
 		return sum;
 	}
 };
+
+}
 
 #endif
