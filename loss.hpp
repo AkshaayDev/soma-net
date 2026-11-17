@@ -2,7 +2,7 @@
 #define SOMA_LOSS_HPP
 
 #include <string>
-#include "matrix.hpp"
+#include "./matrix.hpp"
 
 namespace Soma::Loss {
 	const double epsilon = 1e-12;
@@ -32,8 +32,6 @@ namespace Soma::Loss {
 	}
 }
 
-// Loss functions are network attributes and need to be specified in the network
-// The strings in this namespace are used to identify the loss function in the network for saving and loading
 namespace Soma::LossType {
 	const std::string MSE = "mse";
 	const std::string CCE = "cce";

@@ -10,8 +10,8 @@
 #include <utility>
 #include <vector>
 
-#include "layer.hpp"
-#include "loss.hpp"
+#include "./layers.hpp"
+#include "./loss.hpp"
 
 namespace Soma::Optimizers { class Optimizer; }
 

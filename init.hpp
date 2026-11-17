@@ -4,8 +4,9 @@
 #include <chrono>
 #include <random>
 
-#include "layer.hpp"
-#include "network.hpp"
+#include "./matrix.hpp"
+#include "./layers.hpp"
+#include "./network.hpp"
 
 namespace Soma::Initialization {
 	// Helper functions for initializations
@@ -117,8 +118,5 @@ namespace Soma::Initialization {
 		nn.iterationsTrained = nn.epochsTrained = 0;
 	}
 }
-
-// Initializers are standalone functions and not network attributes
-// Therefore, the initialization functions being used need not be specified in the network
 
 #endif

@@ -8,8 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include "network.hpp"
-#include "optimizer.hpp"
+#include "./network.hpp"
+#include "./optimizers.hpp"
 
 namespace Soma {
 	class Trainer {
@@ -50,8 +50,5 @@ namespace Soma {
 		}
 	};
 }
-
-// Trainers are standalone objects and not network attributes
-// Therefore, the trainer object being used need not be specified in the network
 
 #endif

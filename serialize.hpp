@@ -1,5 +1,5 @@
-#ifndef SOMA_SERIALIZATION_HPP
-#define SOMA_SERIALIZATION_HPP
+#ifndef SOMA_SERIALIZE_HPP
+#define SOMA_SERIALIZE_HPP
 
 #include <cstdint>
 #include <fstream>
@@ -8,8 +8,8 @@
 #include <string>
 #include <utility>
 
-#include "network.hpp"
-#include "optimizer.hpp"
+#include "./network.hpp"
+#include "./optimizers.hpp"
 
 inline void Soma::Network::save(std::ofstream& out, Optimizers::Optimizer* opt) {
 	// Write the signature

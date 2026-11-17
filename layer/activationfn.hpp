@@ -3,7 +3,7 @@
 
 #include <string>
 #include <algorithm>
-#include "./matrix.hpp"
+#include "../matrix.hpp"
 
 namespace Soma::Activation {
 	// Sigmoid activation function
@@ -71,8 +71,6 @@ namespace Soma::Activation {
 	}
 }
 
-// Activation functions are network attributes and need to be specified in the network
-// The strings in this namespace are used to identify the activation functions of the network for saving and loading
 namespace Soma::ActivationType {
 	const std::string Sigmoid = "sigmoid";
 	const std::string ReLU = "relu";
